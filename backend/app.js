@@ -1,15 +1,20 @@
-// app.js
+
 import 'dotenv/config';
 import express from 'express';
 import { connectDB } from './config/db.js';
-import testRoutes from './routes/routesTest.js';
 import cors from 'cors';
+
+
+import exams from './routes/exams.js';
+import questions from './routes/questions.js';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use('/api', testRoutes);
+app.use('/api/exams', exams);
+app.use('/api/questions', questions);
+
 
 connectDB();
 
