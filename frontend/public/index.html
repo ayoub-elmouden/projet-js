@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Configurer l'examen</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Configurer un nouvel examen</h1>
+
+  <div class="form-section">
+    <label>Nom de l'examen :</label>
+    <input type="text" id="exam-name" required><br>
+
+    <label>Nombre de questions :</label>
+    <input type="number" id="nb-questions" min="1" required><br>
+
+    <label>Durée (minutes) :</label>
+    <input type="number" id="exam-duration" min="1" required>
+
+    <button onclick="startCreation()">Commencer</button>
+  </div>
+
+  <script>
+    function startCreation() {
+      const name = document.getElementById("exam-name").value.trim();
+      const nb = parseInt(document.getElementById("nb-questions").value);
+      const duration = parseInt(document.getElementById("exam-duration").value);
+
+      if (!name || !nb || !duration || nb <= 0 || duration <= 0) {
+        alert("Veuillez remplir tous les champs correctement.");
+        return;
+      }
+
+      localStorage.setItem("examName", name);
+      localStorage.setItem("nbQuestions", nb);
+      localStorage.setItem("duration", duration);
+
+      window.location.href = "exam.html";
+    }
+  </script>
+</body>
+</html>
