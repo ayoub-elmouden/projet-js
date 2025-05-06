@@ -11,31 +11,88 @@
 
   <form id="questions-form"></form>
 
-  <button id="generate-btn">Générer l'examen</button>
-  <button id="submit-btn">Soumettre l'examen</button>
+  <button onclick="generateJSON()">Générer l'examen</button>
 
   <h2>Examen JSON</h2>
   <pre id="result-json"></pre>
 
-  <script src="script.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (typeof initExamPage === "function") {
-        initExamPage();
+    const name = localStorage.getItem("examName");
+    const nbQuestions = parseInt(localStorage.getItem("nbQuestions"));
+    const duration = localStorage.getItem("duration");
+
+    document.getElementById("exam-title").textContent = `Examen : ${name}`;
+    document.getElementById("exam-info").textContent = `Durée : ${duration} min | Nombre de questions : ${nbQuestions}`;
+
+    const form = document.getElementById("questions-form");
+
+    for (let i = 0; i < nbQuestions; i++) {
+      const qDiv = document.createElement("div");
+      qDiv.className = "form-section";
+
+      qDiv.innerHTML = `
+        <h3>Question ${i + 1}</h3>
+        <label>Type :</label>
+        <select name="type-${i}" onchange="toggleOptions(this, ${i})">
+          <option value="qcm">QCM</option>
+          <option value="open">Réponse ouverte</option>
+        </select>
+
+        <input type="text" name="text-${i}" placeholder="Texte de la question" required>
+
+        <div class="options" id="options-${i}">
+          <input type="text" name="opt1-${i}" placeholder="Option 1">
+          <input type="text" name="opt2-${i}" placeholder="Option 2">
+          <input type="text" name="opt3-${i}" placeholder="Option 3">
+          <input type="text" name="opt4-${i}" placeholder="Option 4">
+        </div>
+      `;
+      form.appendChild(qDiv);
+    }
+
+    function toggleOptions(select, index) {
+      const optDiv = document.getElementById(`options-${index}`);
+      optDiv.style.display = select.value === "qcm" ? "block" : "none";
+    }
+
+    function generateJSON() {
+      const questions = [];
+
+      for (let i = 0; i < nbQuestions; i++) {
+        const type = document.querySelector(`[name="type-${i}"]`).value;
+        const text = document.querySelector(`[name="text-${i}"]`).value.trim();
+
+        if (!text) {
+          alert(`Veuillez remplir le texte de la question ${i + 1}`);
+          return;
+        }
+
+        const question = { type, text };
+
+        if (type === "qcm") {
+          const opts = [];
+          for (let j = 1; j <= 4; j++) {
+            const val = document.querySelector(`[name="opt${j}-${i}"]`).value.trim();
+            if (val) opts.push(val);
+          }
+          if (opts.length < 2) {
+            alert(`La question ${i + 1} doit avoir au moins 2 options.`);
+            return;
+          }
+          question.options = opts;
+        }
+
+        questions.push(question);
       }
-      document.getElementById("generate-btn").addEventListener("click", (e) => {
-        e.preventDefault();
-        if (typeof generateJSON === "function") {
-          generateJSON();
-        }
-      });
-      document.getElementById("submit-btn").addEventListener("click", (e) => {
-        e.preventDefault();
-        if (typeof submitExam === "function") {
-          submitExam();
-        }
-      });
-    });
+
+      const result = {
+        examName: name,
+        duration: duration,
+        questions: questions
+      };
+
+      document.getElementById("result-json").textContent = JSON.stringify(result, null, 2);
+    }
   </script>
 </body>
 </html>
