@@ -13,8 +13,7 @@
 
   <button onclick="generateJSON()">Générer l'examen</button>
 
-  <h2>Examen JSON</h2>
-  <pre id="result-json"></pre>
+  <pre id="result-json" style="background: #f0f0f0; padding: 15px; white-space: pre-wrap; margin-top: 20px;"></pre>
 
   <script>
     const name = localStorage.getItem("examName");
@@ -46,53 +45,30 @@
           <input type="text" name="opt3-${i}" placeholder="Option 3">
           <input type="text" name="opt4-${i}" placeholder="Option 4">
         </div>
+
+        <div class="open-settings" id="open-${i}" style="display:none;">
+          <input type="text" name="open-answer-${i}" placeholder="Réponse attendue">
+          <input type="number" name="penalty-${i}" placeholder="Réduction de points (optionnel)">
+        </div>
+
+        <input type="number" name="points-${i}" placeholder="Points" required>
       `;
       form.appendChild(qDiv);
     }
 
     function toggleOptions(select, index) {
       const optDiv = document.getElementById(`options-${index}`);
-      optDiv.style.display = select.value === "qcm" ? "block" : "none";
-    }
-
-    function generateJSON() {
-      const questions = [];
-
-      for (let i = 0; i < nbQuestions; i++) {
-        const type = document.querySelector(`[name="type-${i}"]`).value;
-        const text = document.querySelector(`[name="text-${i}"]`).value.trim();
-
-        if (!text) {
-          alert(`Veuillez remplir le texte de la question ${i + 1}`);
-          return;
-        }
-
-        const question = { type, text };
-
-        if (type === "qcm") {
-          const opts = [];
-          for (let j = 1; j <= 4; j++) {
-            const val = document.querySelector(`[name="opt${j}-${i}"]`).value.trim();
-            if (val) opts.push(val);
-          }
-          if (opts.length < 2) {
-            alert(`La question ${i + 1} doit avoir au moins 2 options.`);
-            return;
-          }
-          question.options = opts;
-        }
-
-        questions.push(question);
+      const openDiv = document.getElementById(`open-${index}`);
+      if (select.value === "qcm") {
+        optDiv.style.display = "block";
+        openDiv.style.display = "none";
+      } else {
+        optDiv.style.display = "none";
+        openDiv.style.display = "block";
       }
-
-      const result = {
-        examName: name,
-        duration: duration,
-        questions: questions
-      };
-
-      document.getElementById("result-json").textContent = JSON.stringify(result, null, 2);
     }
   </script>
+
+  <script src="exam-backend.js"></script>
 </body>
 </html>
