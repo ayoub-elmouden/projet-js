@@ -11,64 +11,26 @@
 
   <form id="student-form"></form>
 
-  <button onclick="submitExam()">Soumettre</button>
+  <button id="submit-btn">Soumettre</button>
 
   <h2>Réponses de l'étudiant</h2>
   <pre id="student-answers"></pre>
 
+  <script src="script.js"></script>
   <script>
-    const examData = JSON.parse(localStorage.getItem("examResult")) ||
-    JSON.parse(localStorage.getItem("examJSON")); // alternative pour test
-
-    if (!examData) {
-      alert("Aucun examen trouvé !");
-      location.href = "index.html";
-    }
-
-    document.getElementById("exam-title").textContent = `Examen : ${examData.examName}`;
-    document.getElementById("exam-info").textContent = `Durée : ${examData.duration} minutes`;
-
-    const form = document.getElementById("student-form");
-
-    examData.questions.forEach((q, index) => {
-      const qDiv = document.createElement("div");
-      qDiv.className = "form-section";
-
-      qDiv.innerHTML = `<h3>Q${index + 1}. ${q.text}</h3>`;
-
-      if (q.type === "qcm") {
-        q.options.forEach((opt, i) => {
-          const id = `q${index}-opt${i}`;
-          qDiv.innerHTML += `
-            <div>
-              <input type="radio" name="q${index}" value="${opt}" id="${id}">
-              <label for="${id}">${opt}</label>
-            </div>`;
-        });
-      } else {
-        qDiv.innerHTML += `<textarea name="q${index}" rows="3" placeholder="Votre réponse ici..."></textarea>`;
+    // Initialize the exam form and bind submit button
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof initStudentExam === "function") {
+        initStudentExam();
       }
-
-      form.appendChild(qDiv);
-    });
-
-    function submitExam() {
-      const answers = {};
-
-      examData.questions.forEach((q, index) => {
-        const name = `q${index}`;
-        const field = document.querySelector(`[name="${name}"]`);
-        if (q.type === "qcm") {
-          const selected = document.querySelector(`input[name="${name}"]:checked`);
-          answers[`Q${index + 1}`] = selected ? selected.value : "Aucune réponse";
-        } else {
-          answers[`Q${index + 1}`] = field.value.trim() || "Aucune réponse";
+      const submitBtn = document.getElementById("submit-btn");
+      submitBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (typeof submitExam === "function") {
+          submitExam();
         }
       });
-
-      document.getElementById("student-answers").textContent = JSON.stringify(answers, null, 2);
-      localStorage.setItem("examResult", JSON.stringify(result));
-    }
+    });
   </script>
 </body>
 </html>
