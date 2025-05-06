@@ -12,6 +12,7 @@ CREATE TABLE `inf_enseignants` (
     `Nom` VARCHAR(50) NOT NULL,
     `Prenom` VARCHAR(50) NOT NULL,
     `email` VARCHAR(50) NOT NULL UNIQUE, 
+    `password` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`Id_Prof`)
 );
 
@@ -33,6 +34,7 @@ CREATE TABLE `inf_etu` (
     `Sexe` ENUM('M', 'F', 'Autre') DEFAULT NULL,
     `Etablissement` VARCHAR(50) DEFAULT NULL,
     `Id_fil` INT(11) NOT NULL,
+    `password` VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY (`Id_etu`),
     FOREIGN KEY (`Id_fil`) REFERENCES `inf_fil` (`Id_fil`),
     INDEX (`Id_fil`)
