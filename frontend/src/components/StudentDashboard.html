@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - ExamTrack</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #27ae60;
+            --warning-color: #e67e22;
+            --danger-color: #e74c3c;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #333;
+            --text-color: #333;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: var(--text-color);
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .student-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-name {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .student-details {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .logout-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .logout-btn i {
+            margin-right: 5px;
+        }
+
+        .dashboard-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .card-primary {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--primary-color);
+        }
+
+        .card-success {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success-color);
+        }
+
+        .card-warning {
+            background-color: rgba(230, 126, 34, 0.2);
+            color: var(--warning-color);
+        }
+
+        .card-danger {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger-color);
+        }
+
+        .card-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .card-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .grades-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dropdown-filter {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--medium-gray);
+        }
+
+        .search-box {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--medium-gray);
+        }
+
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .grades-table th, .grades-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .grades-table th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+
+        .grades-table tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .semester-header {
+            background-color: #607d8b !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .grade-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-block;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .badge-success {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success-color);
+        }
+
+        .badge-warning {
+            background-color: rgba(230, 126, 34, 0.2);
+            color: var(--warning-color);
+        }
+
+        .badge-danger {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger-color);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .semester-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            color: inherit;
+            font-size: 16px;
+        }
+
+        .semester-content {
+            display: table-row-group;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .status-valide {
+            color: var(--success-color);
+            font-weight: 500;
+        }
+
+        .status-acquis {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .status-ajourne {
+            color: var(--danger-color);
+            font-weight: 500;
+        }
+
+        .status-rattrapage {
+            color: var(--warning-color);
+            font-weight: 500;
+        }
+
+        .exams-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .exam-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .exam-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .exam-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .exam-info {
+            margin-bottom: 15px;
+        }
+
+        .exam-info div {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .exam-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .exam-btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .courses-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .course-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-header {
+            margin-bottom: 15px;
+        }
+
+        .course-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .course-instructor {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .course-info {
+            margin-bottom: 15px;
+        }
+
+        .course-info div {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .profile-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-section {
+            margin-bottom: 20px;
+        }
+
+        .profile-section h3 {
+            border-bottom: 1px solid var(--medium-gray);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .profile-info-item {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .profile-info-label {
+            width: 150px;
+            font-weight: 500;
+        }
+
+        .profile-info-value {
+            flex: 1;
+        }
+
+        .help-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .help-section {
+            margin-bottom: 30px;
+        }
+
+        .help-section h3 {
+            border-bottom: 1px solid var(--medium-gray);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+        }
+
+        .faq-question {
+            font-weight: 500;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .faq-answer {
+            color: #555;
+            padding-left: 15px;
+        }
+
+        .loading-message {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 10px 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .dashboard-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .logout-btn {
+                margin-top: 10px;
+            }
+
+            .grades-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .exams-container, .courses-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .section-actions {
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .dropdown-filter, .search-box {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">ExamTrack</div>
+                <div>Student Portal</div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <i>📊</i> Dashboard
+                </li>
+                <li class="nav-item" data-page="exams">
+                    <i>📝</i> Exams
+                </li>
+                <li class="nav-item" data-page="courses">
+                    <i>📚</i> Courses
+                </li>
+                <li class="nav-item" data-page="schedule">
+                    <i>📅</i> Schedule
+                </li>
+                <li class="nav-item" data-page="profile">
+                    <i>👤</i> Profile
+                </li>
+                <li class="nav-item" data-page="help">
+                    <i>❓</i> Help
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header with Student Info -->
+            <div class="header">
+                <div class="student-info">
+                    <div class="student-name" id="student-name">Loading...</div>
+                    <div class="student-details" id="student-details">Loading...</div>
+                </div>
+                <button class="logout-btn" id="logout-btn">
+                    <i>🚪</i> Logout
+                </button>
+            </div>
+
+            <!-- Main content area with pages -->
+            <div id="page-container">
+                <!-- Dashboard Page -->
+                <div class="page" id="dashboard-page">
+                    <!-- Dashboard Summary Cards -->
+                    <div class="dashboard-summary">
+                        <div class="summary-card">
+                            <div class="card-icon card-primary">📊</div>
+                            <div class="card-info">
+                                <div class="card-value" id="average-grade">--</div>
+                                <div class="card-label">Average Grade</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-icon card-success">✅</div>
+                            <div class="card-info">
+                                <div class="card-value" id="passed-modules">--</div>
+                                <div class="card-label">Passed Modules</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-icon card-warning">⏳</div>
+                            <div class="card-info">
+                                <div class="card-value" id="pending-exams">--</div>
+                                <div class="card-label">Pending Exams</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-icon card-danger">⚠️</div>
+                            <div class="card-info">
+                                <div class="card-value" id="failed-modules">--</div>
+                                <div class="card-label">Failed Modules</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grades Section -->
+                    <div class="grades-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Academic Records</h2>
+                            <div class="section-actions">
+                                <select class="dropdown-filter" id="year-filter">
+                                    <option value="all">All Years</option>
+                                    <option value="2023/2024">2023/2024</option>
+                                    <option value="2024/2025">2024/2025</option>
+                                </select>
+                                <input type="text" class="search-box" id="search-modules" placeholder="Search modules...">
+                            </div>
+                        </div>
+
+                        <table class="grades-table" id="grades-table">
+                            <thead>
+                                <tr>
+                                    <th>Element</th>
+                                    <th>Note</th>
+                                    <th>Result</th>
+                                    <th>Session</th>
+                                    <th>Year</th>
+                                </tr>
+                            </thead>
+                            <tbody id="grades-body">
+                                <tr>
+                                    <td colspan="5" class="text-center">Loading grades data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Exams Page -->
+                <div class="page" id="exams-page" style="display: none;">
+                    <div class="section-header">
+                        <h2 class="section-title">Upcoming Exams</h2>
+                    </div>
+
+                    <div class="exams-container" id="upcoming-exams">
+                        <div class="loading-message">Loading upcoming exams...</div>
+                    </div>
+
+                    <div class="section-header" style="margin-top: 30px;">
+                        <h2 class="section-title">Completed Exams</h2>
+                    </div>
+
+                    <div class="exams-container" id="completed-exams">
+                        <div class="loading-message">Loading completed exams...</div>
+                    </div>
+                </div>
+
+                <!-- Courses Page -->
+                <div class="page" id="courses-page" style="display: none;">
+                    <div class="section-header">
+                        <h2 class="section-title">My Courses</h2>
+                    </div>
+
+                    <div class="courses-container" id="courses-list">
+                        <div class="loading-message">Loading your courses...</div>
+                    </div>
+                </div>
+
+                <!-- Schedule Page -->
+                <div class="page" id="schedule-page" style="display: none;">
+                    <div class="section-header">
+                        <h2 class="section-title">Exam Schedule</h2>
+                    </div>
+
+                    <div class="calendar-container" id="exam-calendar">
+                        <div class="loading-message">Loading your exam schedule...</div>
+                    </div>
+                </div>
+
+                <!-- Profile Page -->
+                <div class="page" id="profile-page" style="display: none;">
+                    <div class="section-header">
+                        <h2 class="section-title">My Profile</h2>
+                    </div>
+
+                    <div class="profile-container" id="profile-details">
+                        <div class="loading-message">Loading profile information...</div>
+                    </div>
+                </div>
+
+                <!-- Help Page -->
+                <div class="page" id="help-page" style="display: none;">
+                    <div class="section-header">
+                        <h2 class="section-title">Help & Support</h2>
+                    </div>
+
+                    <div class="help-container">
+                        <div class="help-section">
+                            <h3>Frequently Asked Questions</h3>
+                            <div class="faq-item">
+                                <div class="faq-question">How do I take an exam?</div>
+                                <div class="faq-answer">
+                                    To take an exam, navigate to the Exams page and click on the "Start Exam" button for any upcoming exams listed.
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <div class="faq-question">How are my grades calculated?</div>
+                                <div class="faq-answer">
+                                    Your grades are calculated based on the scoring criteria set by your instructors for each exam and question.
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <div class="faq-question">What do the different result statuses mean?</div>
+                                <div class="faq-answer">
+                                    <ul>
+                                        <li><strong>VALIDÉ (V):</strong> Module passed</li>
+                                        <li><strong>VALIDÉ PAR EQUIVALENCE (VE):</strong> Module validated by equivalence</li>
+                                        <li><strong>AJOURNÉ (AJ):</strong> Module failed</li>
+                                        <li><strong>NON VALIDÉ (NV):</strong> Module not validated</li>
+                                        <li><strong>RATTRAPAGE (RAT):</strong> Resit required</li>
+                                        <li><strong>ACQUIS (AC):</strong> Module acquired</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3>Contact Support</h3>
+                            <p>If you need assistance, please contact our support team:</p>
+                            <p><strong>Email:</strong> support@examtrack.edu</p>
+                            <p><strong>Phone:</strong> +123-456-7890</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        function checkLogin() {
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            if (!user) {
+                window.location.href = '/login.html';
+                return null;
+            }
+            return user;
+        }
+
+        // Logout functionality
+        function setupLogout() {
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to logout?')) {
+                    // Clear user session data
+                    sessionStorage.removeItem('user');
+
+                    // Redirect to login page
+                    window.location.href = '/login.html';
+                }
+            });
+        }
+
+        // Navigation functionality
+        function setupNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.page');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const pageName = this.getAttribute('data-page');
+
+                    // Update active navigation
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Show selected page, hide others
+                    pages.forEach(page => {
+                        if (page.id === `${pageName}-page`) {
+                            page.style.display = 'block';
+                        } else {
+                            page.style.display = 'none';
+                        }
+                    });
+
+                    // Load page specific data if needed
+                    loadPageData(pageName);
+                });
+            });
+        }
+
+        // Load data specific to each page
+        function loadPageData(pageName) {
+            switch(pageName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'exams':
+                    loadExamsData();
+                    break;
+                case 'courses':
+                    loadCoursesData();
+                    break;
+                case 'schedule':
+                    loadScheduleData();
+                    break;
+                case 'profile':
+                    loadProfileData();
+                    break;
+                // No need to load data for help page as it's static
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            const user = checkLogin();
+            if (!user) return;
+
+            try {
+                // Display student info
+                document.getElementById('student-name').textContent = `${user.Nom} ${user.Prenom}`;
+                document.getElementById('student-details').textContent = `ID: ${user.Id_etu} | Filière: ${user.Filiere}`;
+
+                // Fetch grades data
+                const response = await fetch(`/api/student/grades?id=${user.Id_etu}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateDashboardSummary(data);
+                    populateGradesTable(data);
+
+                    // Set up filter functionality
+                    setupGradesFilter(data);
+                } else {
+                    console.error('Error fetching grades:', data.message);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Update dashboard summary cards with statistics
+        function updateDashboardSummary(gradesData) {
+            // Calculate statistics from grades data
+            let totalModules = gradesData.length;
+            let passedModules = 0;
+            let failedModules = 0;
+            let pendingExams = 0;
+            let totalGradePoints = 0;
+            let gradedModules = 0;
+
+            gradesData.forEach(grade => {
+                if (grade.Note !== null && !isNaN(grade.Note)) {
+                    totalGradePoints += parseFloat(grade.Note);
+                    gradedModules++;
+
+                    if (grade.Resultat === 'VALIDÉ' || grade.Resultat === 'VALIDÉ PAR EQUIVALENCE' || grade.Resultat === 'ACQUIS') {
+                        passedModules++;
+                    } else if (grade.Resultat === 'AJOURNÉ' || grade.Resultat === 'NON VALIDÉ') {
+                        failedModules++;
+                    } else if (grade.Resultat === 'RATTRAPAGE' || grade.Resultat === null) {
+                        pendingExams++;
+                    }
+                }
+            });
+
+            const averageGrade = gradedModules > 0 ? (totalGradePoints / gradedModules).toFixed(2) : '--';
+
+            // Update summary cards
+            document.getElementById('average-grade').textContent = averageGrade;
+            document.getElementById('passed-modules').textContent = passedModules;
+            document.getElementById('pending-exams').textContent = pendingExams;
+            document.getElementById('failed-modules').textContent = failedModules;
+        }
+
+        // Populate the grades table with data
+        function populateGradesTable(gradesData) {
+            const tableBody = document.getElementById('grades-body');
+            tableBody.innerHTML = '';
+
+            if (gradesData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No grades data available</td></tr>';
+                return;
+            }
+
+            // Group by academic year and semester
+            const groupedGrades = {};
+
+            gradesData.forEach(grade => {
+                if (!groupedGrades[grade.Annee]) {
+                    groupedGrades[grade.Annee] = {};
+                }
+
+                if (!groupedGrades[grade.Annee][grade.Session]) {
+                    groupedGrades[grade.Annee][grade.Session] = [];
+                }
+
+                groupedGrades[grade.Annee][grade.Session].push(grade);
+            });
+
+            // Sort by year (most recent first)
+            const sortedYears = Object.keys(groupedGrades).sort().reverse();
+
+            sortedYears.forEach(year => {
+                const semesters = Object.keys(groupedGrades[year]).sort();
+
+                semesters.forEach(semester => {
+                    // Add semester header
+                    const semesterId = `${year}-${semester.replace(' ', '-')}`;
+
+                    const semesterRow = document.createElement('tr');
+                    semesterRow.className = 'semester-header';
+                    semesterRow.innerHTML = `
+                        <td colspan="5">
+                            <button class="semester-toggle" data-target="${semesterId}">
+                                ${year} - ${semester} <span class="toggle-icon">▼</span>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(semesterRow);
+
+                    // Create semester content container
+                    const semesterContent = document.createElement('tbody');
+                    semesterContent.id = semesterId;
+                    semesterContent.className = 'semester-content';
+
+                    // Add grades for this semester
+                    groupedGrades[year][semester].forEach(grade => {
+                        const gradeRow = document.createElement('tr');
+
+                        let resultClass = '';
+                        if (grade.Resultat === 'VALIDÉ' || grade.Resultat === 'VALIDÉ PAR EQUIVALENCE' || grade.Resultat === 'ACQUIS') {
+                            resultClass = 'status-valide';
+                        } else if (grade.Resultat === 'AJOURNÉ' || grade.Resultat === 'NON VALIDÉ') {
+                            resultClass = 'status-ajourne';
+                        } else if (grade.Resultat === 'RATTRAPAGE') {
+                            resultClass = 'status-rattrapage';
+                        }
+
+                        gradeRow.innerHTML = `
+                            <td>${grade.Element}</td>
+                            <td>${grade.Note !== null ? grade.Note : '--'}</td>
+                            <td class="${resultClass}">${grade.Resultat || '--'}</td>
+                            <td>${grade.Session}</td>
+                            <td>${grade.Annee}</td>
+                        `;
+
+                        semesterContent.appendChild(gradeRow);
+                    });
+
+                    tableBody.appendChild(semesterContent);
+
+                    // Set up toggle functionality
+                    const toggleBtn = semesterRow.querySelector('.semester-toggle');
+                    toggleBtn.addEventListener('click', function() {
+                        const targetId = this.getAttribute('data-target');
+                        const targetContent = document.getElementById(targetId);
+                        const toggleIcon = this.querySelector('.toggle-icon');
+
+                        if (targetContent.classList.contains('hidden')) {
+                            targetContent.classList.remove('hidden');
+                            toggleIcon.textContent = '▼';
+                        } else {
+                            targetContent.classList.add('hidden');
+                            toggleIcon.textContent = '►';
+                        }
+                    });
+                });
+            });
+        }
+
+        // Set up filter functionality for grades table
+        function setupGradesFilter(gradesData) {
+            const yearFilter = document.getElementById('year-filter');
+            const searchInput = document.getElementById('search-modules');
+
+            // Populate year filter dropdown with unique years
+            const years = [...new Set(gradesData.map(grade => grade.Annee))].sort().reverse();
+
+            years.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearFilter.appendChild(option);
+            });
+
+            // Handle year filter change
+            yearFilter.addEventListener('change', function() {
+                filterGrades();
+            });
+
+            // Handle search input
+            searchInput.addEventListener('input', function() {
+                filterGrades();
+            });
+
+            // Filter function
+            function filterGrades() {
+                const selectedYear = yearFilter.value;
+                const searchText = searchInput.value.toLowerCase();
+
+                // Get all semester headers and content
+                const semesterHeaders = document.querySelectorAll('.semester-header');
+                const semesterContents = document.querySelectorAll('.semester-content');
+
+                // Handle year filter
+                semesterHeaders.forEach(header => {
+                    const year = header.querySelector('.semester-toggle').textContent.split(' - ')[0].trim();
+                    const contentId = header.querySelector('.semester-toggle').getAttribute('data-target');
+                    const content = document.getElementById(contentId);
+
+                    if (selectedYear === 'all' || year === selectedYear) {
+                        header.style.display = '';
+                        content.style.display = '';
+                    } else {
+                        header.style.display = 'none';
+                        content.style.display = 'none';
+                    }
+                });
+
+                // Handle search filter
+                if (searchText) {
+                    // Filter rows in visible semester contents
+                    semesterContents.forEach(content => {
+                        if (content.style.display !== 'none') {
+                            const rows = content.querySelectorAll('tr');
+                            let hasVisibleRows = false;
+
+                            rows.forEach(row => {
+                                const moduleText = row.cells[0].textContent.toLowerCase();
+
+                                if (moduleText.includes(searchText)) {
+                                    row.style.display = '';
+                                    hasVisibleRows = true;
+                                } else {
+                                    row.style.display = 'none';
+                                }
+                            });
+
+                            // Show/hide semester header based on whether it has visible rows
+                            const headerId = content.id;
+                            const header = document.querySelector(`[data-target="${headerId}"]`).closest('tr');
+
+                            header.style.display = hasVisibleRows ? '' : 'none';
+                        }
+                    });
+                }
+            }
+        }
+
+        // Load exams data
+        async function loadExamsData() {
+            const user = checkLogin();
+            if (!user) return;
+
+            try {
+                // Fetch upcoming exams
+                const upcomingResponse = await fetch(`/api/student/exams/upcoming?id=${user.Id_etu}`);
+                const upcomingData = await upcomingResponse.json();
+
+                const upcomingExamsContainer = document.getElementById('upcoming-exams');
+
+                if (upcomingResponse.ok) {
+                    if (upcomingData.length > 0) {
+                        upcomingExamsContainer.innerHTML = '';
+
+                        upcomingData.forEach(exam => {
+                            const examCard = createExamCard(exam, 'upcoming');
+                            upcomingExamsContainer.appendChild(examCard);
+                        });
+                    } else {
+                        upcomingExamsContainer.innerHTML = '<div class="no-data-message">No upcoming exams scheduled.</div>';
+                    }
+                } else {
+                    console.error('Error fetching upcoming exams:', upcomingData.message);
+                    upcomingExamsContainer.innerHTML = '<div class="error-message">Failed to load upcoming exams.</div>';
+                }
+
+                // Fetch completed exams
+                const completedResponse = await fetch(`/api/student/exams/completed?id=${user.Id_etu}`);
+                const completedData = await completedResponse.json();
+
+                const completedExamsContainer = document.getElementById('completed-exams');
+
+                if (completedResponse.ok) {
+                    if (completedData.length > 0) {
+                        completedExamsContainer.innerHTML = '';
+
+                        completedData.forEach(exam => {
+                            const examCard = createExamCard(exam, 'completed');
+                            completedExamsContainer.appendChild(examCard);
+                        });
+                    } else {
+                        completedExamsContainer.innerHTML = '<div class="no-data-message">No completed exams found.</div>';
+                    }
+                } else {
+                    console.error('Error fetching completed exams:', completedData.message);
+                    completedExamsContainer.innerHTML = '<div class="error-message">Failed to load completed exams.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading exams data:', error);
+            }
+        }
+
+        // Create an exam card element
+        function createExamCard(exam, type) {
+            const examDate = new Date(exam.Date);
+            const formattedDate = examDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const formattedTime = examDate.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const card = document.createElement('div');
+            card.className = 'exam-card';
+
+            let statusClass = '';
+            let statusText = '';
+            let actionButton = '';
+
+            if (type === 'upcoming') {
+                statusClass = 'badge-warning';
+                statusText = 'Upcoming';
+
+                const examStartTime = new Date(exam.Date);
+                const now = new Date();
+                const timeDiff = examStartTime - now;
+                const minutesDiff = Math.floor(timeDiff / 60000);
+
+                // If exam is starting within 30 minutes, allow student to enter
+                if (minutesDiff <= 30 && minutesDiff >= 0) {
+                    actionButton = `<button class="exam-btn btn-primary" onclick="startExam(${exam.Id_exam})">Enter Exam</button>`;
+                } else {
+                    actionButton = `<button class="exam-btn btn-primary" disabled>Available ${minutesDiff > 30 ? 'in ' + Math.floor(minutesDiff / 60) + ' hours' : 'soon'}</button>`;
+                }
+            } else if (type === 'completed') {
+                if (exam.Score !== null) {
+                    const scorePercentage = (exam.Score / exam.Score_Total) * 100;
+
+                    if (scorePercentage >= 60) {
+                        statusClass = 'badge-success';
+                        statusText = 'Passed';
+                    } else {
+                        statusClass = 'badge-danger';
+                        statusText = 'Failed';
+                    }
+
+                    actionButton = `<button class="exam-btn btn-primary" onclick="viewExamResults(${exam.Id_exam})">View Results</button>`;
+                } else {
+                    statusClass = 'badge-warning';
+                    statusText = 'Pending Results';
+                    actionButton = '';
+                }
+            }
+
+            card.innerHTML = `
+                <div class="exam-header">
+                    <div class="exam-title">${exam.Titre}</div>
+                    <div class="exam-status ${statusClass}">${statusText}</div>
+                </div>
+                <div class="exam-info">
+                    <div><strong>Subject:</strong> ${exam.Matiere}</div>
+                    <div><strong>Date:</strong> ${formattedDate}</div>
+                    <div><strong>Time:</strong> ${formattedTime}</div>
+                    <div><strong>Duration:</strong> ${exam.Duree} minutes</div>
+                    ${exam.Score !== undefined ? `<div><strong>Score:</strong> ${exam.Score}/${exam.Score_Total}</div>` : ''}
+                </div>
+                <div class="exam-actions">
+                    ${actionButton}
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Start exam function
+        function startExam(examId) {
+            window.location.href = `/exam.html?id=${examId}`;
+        }
+
+        // View exam results function
+        function viewExamResults(examId) {
+            window.location.href = `/exam-results.html?id=${examId}`;
+        }
+
+        // Load courses data
+        async function loadCoursesData() {
+            const user = checkLogin();
+            if (!user) return;
+
+            try {
+                // Fetch student's courses
+                const response = await fetch(`/api/student/courses?id=${user.Id_etu}`);
+                const coursesData = await response.json();
+                const coursesContainer = document.getElementById('courses-list');
+
+                if (response.ok) {
+                    if (coursesData.length > 0) {
+                        coursesContainer.innerHTML = '';
+                        coursesData.forEach(course => {
+                            const courseCard = document.createElement('div');
+                            courseCard.className = 'course-card';
+                            courseCard.innerHTML = `
+                                <div class="course-header">
+                                    <div class="course-title">${course.Matiere}</div>
+                                    <div class="course-instructor">${course.ProfNom} ${course.ProfPrenom}</div>
+                                </div>
+                                <div class="course-info">
+                                    <div><strong>Course Code:</strong> ${course.Id_mat}</div>
+                                    <div><strong>Upcoming Exams:</strong> ${course.UpcomingExams || 'None'}</div>
+                                </div>
+                                <div class="course-actions">
+                                    <button class="exam-btn btn-primary" onclick="viewCourseDetails(${course.Id_mat})">View Details</button>
+                                </div>
+                            `;
+                            coursesContainer.appendChild(courseCard);
+                        });
+                    } else {
+                        coursesContainer.innerHTML = '<div class="no-data-message">No courses found for this semester.</div>';
+                    }
+                } else {
+                    console.error('Error fetching courses:', coursesData.message);
+                    coursesContainer.innerHTML = '<div class="error-message">Failed to load courses.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading courses data:', error);
+            }
+        }
+
+        // View course details function
+        function viewCourseDetails(courseId) {
+            window.location.href = `/course-details.html?id=${courseId}`;
+        }
+
+        // Load schedule data
+        async function loadScheduleData() {
+            const user = checkLogin();
+            if (!user) return;
+
+            try {
+                // Fetch student's exam schedule
+                const response = await fetch(`/api/student/exam-schedule?id=${user.Id_etu}`);
+                const scheduleData = await response.json();
+                const calendarContainer = document.getElementById('exam-calendar');
+
+                if (response.ok) {
+                    if (scheduleData.length > 0) {
+                        // Create a simple calendar view
+                        calendarContainer.innerHTML = createCalendarView(scheduleData);
+                    } else {
+                        calendarContainer.innerHTML = '<div class="no-data-message">No exams scheduled.</div>';
+                    }
+                } else {
+                    console.error('Error fetching schedule:', scheduleData.message);
+                    calendarContainer.innerHTML = '<div class="error-message">Failed to load exam schedule.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading schedule data:', error);
+            }
+        }
+
+        // Create a simple calendar view
+        function createCalendarView(examEvents) {
+            // Group exams by month and day
+            const groupedExams = {};
+            examEvents.forEach(exam => {
+                const examDate = new Date(exam.Date);
+                const monthYear = examDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                const day = examDate.getDate();
+                if (!groupedExams[monthYear]) {
+                    groupedExams[monthYear] = {};
+                }
+                if (!groupedExams[monthYear][day]) {
+                    groupedExams[monthYear][day] = [];
+                }
+                groupedExams[monthYear][day].push(exam);
+            });
+
+            // Create calendar HTML
+            let calendarHTML = '<div class="calendar-view">';
+
+            // Sort months chronologically
+            const sortedMonths = Object.keys(groupedExams).sort((a, b) => {
+                const dateA = new Date(a);
+                const dateB = new Date(b);
+                return dateA - dateB;
+            });
+
+            sortedMonths.forEach(month => {
+                calendarHTML += `<div class="calendar-month">
+                    <h3 class="month-header">${month}</h3>
+                    <div class="month-events">`;
+
+                // Sort days numerically
+                const sortedDays = Object.keys(groupedExams[month]).sort((a, b) => parseInt(a) - parseInt(b));
+                sortedDays.forEach(day => {
+                    calendarHTML += `<div class="day-events">
+                        <h4 class="day-header">${day}</h4>`;
+                    groupedExams[month][day].forEach(exam => {
+                        const examTime = new Date(exam.Date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                        calendarHTML += `<div class="calendar-event">
+                            <div class="event-time">${examTime}</div>
+                            <div class="event-title">${exam.Titre}</div>
+                            <div class="event-details">
+                                <div><strong>Subject:</strong> ${exam.Matiere}</div>
+                                <div><strong>Duration:</strong> ${exam.Duree} minutes</div>
+                            </div>
+                        </div>`;
+                    });
+                    calendarHTML += `</div>`;
+                });
+                calendarHTML += `</div></div>`;
+            });
+            calendarHTML += '</div>';
+
+            // Add calendar styles
+            calendarHTML += `
+                <style>
+                    .calendar-view {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 20px;
+                    }
+                    .calendar-month {
+                        background-color: white;
+                        border-radius: 10px;
+                        padding: 15px;
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    }
+                    .month-header {
+                        font-size: 18px;
+                        margin-bottom: 15px;
+                        padding-bottom: 10px;
+                        border-bottom: 1px solid var(--medium-gray);
+                    }
+                    .month-events {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 15px;
+                    }
+                    .day-header {
+                        font-size: 16px;
+                        margin-bottom: 10px;
+                        font-weight: 500;
+                    }
+                    .calendar-event {
+                        background-color: #f5f8ff;
+                        border-left: 3px solid var(--primary-color);
+                        padding: 10px;
+                        margin-bottom: 10px;
+                        border-radius: 5px;
+                    }
+                    .event-time {
+                        font-weight: 500;
+                        color: var(--primary-color);
+                        margin-bottom: 5px;
+                    }
+                    .event-title {
+                        font-weight: 500;
+                        margin-bottom: 5px;
+                    }
+                    .event-details {
+                        font-size: 14px;
+                        color: #666;
+                    }
+                </style>
+            `;
+
+            return calendarHTML;
+        }
+
+        // Load profile data
+        async function loadProfileData() {
+            const user = checkLogin();
+            if (!user) return;
+
+            try {
+                // Fetch student's detailed profile
+                const response = await fetch(`/api/student/profile?id=${user.Id_etu}`);
+                const profileData = await response.json();
+                const profileContainer = document.getElementById('profile-details');
+
+                if (response.ok) {
+                    // Format date of birth
+                    const dob = profileData.Date_Naiss ? new Date(profileData.Date_Naiss).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
+                    profileContainer.innerHTML = `
+                        <div class="profile-section">
+                            <h3>Personal Information</h3>
+                            <div class="profile-info">
+                                <div class="profile-info-item">
+                                    <div class="profile-info-label">Name:</div>
+                                    <div class="profile-info-value">${profileData.Nom} ${profileData.Prenom}</div>
+                                </div>
+                                <div class="profile-info-item">
+                                    <div class="profile-info-label">Student ID:</div>
+                                    <div class="profile-info-value">${profileData.Id_etu}</div>
+                                </div>
+                                <div class="profile-info-item">
+                                    <div class="profile-info-label">Date of Birth:</div>
+                                    <div class="profile-info-value">${dob}</div>
+                                </div>
+                                <div class="profile-info-item">
+                                    <div class="profile-info-label">Gender:</div>
+                                    <div class="profile-info-value">${profileData.Sexe || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-section">
+                            <h3>Academic Information</h3>
+                            <div class="profile-info">
+                                <div class="profile-info-item">
+                                    <div class="profile-info-label">Program:</div>
+                                    <div class="profile-info-value">${profileData.Filiere}</div>
+                                </div>
+                                <div class="profile-info-item">
+                                    <div class="profile-info-label">Institution:</div>
+                                    <div class="profile-info-value">${profileData.Etablissement || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-section">
+                            <h3>Contact Information</h3>
+                            <div class="profile-info">
+                                <div class="profile-info-item">
+                                    <div class="profile-info-label">Email:</div>
+                                    <div class="profile-info-value">${profileData.email || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="exam-btn btn-primary" onclick="editProfile()">Edit Profile</button>
+                            <button class="exam-btn btn-primary" onclick="changePassword()">Change Password</button>
+                        </div>
+                    `;
+                } else {
+                    console.error('Error fetching profile:', profileData.message);
+                    profileContainer.innerHTML = '<div class="error-message">Failed to load profile information.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+            }
+        }
+
+        // Edit profile function
+        function editProfile() {
+            // Implementation for profile editing
+            alert('Profile editing functionality will be implemented here.');
+        }
+
+        // Change password function
+        function changePassword() {
+            // Implementation for password change
+            alert('Password change functionality will be implemented here.');
+        }
+
+        // Initialize the dashboard
+        function initDashboard() {
+            const user = checkLogin();
+            if (!user) return;
+
+            // Setup navigation and logout
+            setupNavigation();
+            setupLogout();
+
+            // Load initial dashboard data
+            loadDashboardData();
+        }
+
+        // Call initialization when page loads
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>
