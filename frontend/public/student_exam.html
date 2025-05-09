@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Passer l'examen</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #timer {
+      font-size: 20px;
+      color: red;
+      margin-bottom: 15px;
+    }
+    textarea {
+      width: 100%;
+      height: 60px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="exam-title"></h1>
+  <p id="exam-info"></p>
+  <p id="timer"></p>
+
+  <form id="student-form"></form>
+
+  <button onclick="submitExam()">Soumettre</button>
+
+  <div id="result-section" style="display:none;">
+    <h2>Résultat de l'étudiant</h2>
+    <p id="score-text"></p>
+    <h3>Réponses ouvertes</h3>
+    <pre id="open-answers"></pre>
+  </div>
+
+  <script>
+    async function fetchExam(examId) {
+      try {
+        const response = await fetch(`/exams/${examId}`);
+        if (!response.ok) {
+          alert("Erreur lors du chargement de l'examen.");
+          window.location.href = "index.html";
+          return null;
+        }
+        const exam = await response.json();
+        return exam;
+      } catch (error) {
+        alert("Erreur réseau lors du chargement de l'examen.");
+        window.location.href = "index.html";
+        return null;
+      }
+    }
+
+    async function initExam() {
+      const examData = JSON.parse(localStorage.getItem("examResult"));
+      if (!examData || !examData.id) {
+        alert("Aucun examen trouvé !");
+        window.location.href = "index.html";
+        return;
+      }
+
+      const exam = await fetchExam(examData.id);
+      if (!exam) return;
+
+      const form = document.getElementById("student-form");
+      const duration = parseInt(exam.Duree); // minutes
+      let timeLeft = duration * 60; // en secondes
+
+      document.getElementById("exam-title").textContent = `Examen : ${exam.Titre}`;
+      document.getElementById("exam-info").textContent = `Durée : ${exam.Duree} minutes`;
+
+      // Générer les questions
+      exam.questions.forEach((q, index) => {
+        const qDiv = document.createElement("div");
+        qDiv.className = "form-section";
+
+        qDiv.innerHTML = `<h3>Q${index + 1}. ${q.Contenu}</h3>`;
+
+        if (q.Type_Question === "QCM") {
+          q.options.forEach((opt, i) => {
+            const id = `q${index}-opt${i}`;
+            qDiv.innerHTML += `
+              <div>
+                <input type="radio" name="q${index}" value="${opt.Option_Text}" id="${id}">
+                <label for="${id}">${opt.Option_Text}</label>
+              </div>`;
+          });
+          // marquer la bonne réponse en localStorage (pour test)
+          if (!q.answer) q.answer = q.options[0].Option_Text; // par défaut la 1ère
+        } else {
+          qDiv.innerHTML += `<textarea name="q${index}" placeholder="Votre réponse ici..."></textarea>`;
+        }
+
+        form.appendChild(qDiv);
+      });
+
+      // TIMER
+      const timerDisplay = document.getElementById("timer");
+      const countdown = setInterval(() => {
+        const min = Math.floor(timeLeft / 60);
+        const sec = timeLeft % 60;
+        timerDisplay.textContent = `Temps restant : ${min}m ${sec < 10 ? '0' + sec : sec}s`;
+
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          alert("Temps écoulé ! L'examen est terminé.");
+          submitExam();
+        }
+
+        timeLeft--;
+      }, 1000);
+
+      window.submitExam = function() {
+        clearInterval(countdown);
+        const studentAnswers = [];
+        let score = 0;
+        let totalQCM = 0;
+        const openAnswers = [];
+
+        exam.questions.forEach((q, index) => {
+          const name = `q${index}`;
+          let answer = "";
+
+          if (q.Type_Question === "QCM") {
+            const selected = document.querySelector(`input[name="${name}"]:checked`);
+            answer = selected ? selected.value : "Aucune réponse";
+            if (answer === q.answer) score++;
+            totalQCM++;
+          } else {
+            const field = document.querySelector(`[name="${name}"]`);
+            answer = field ? field.value.trim() : "";
+            openAnswers.push({ question: q.Contenu, answer });
+          }
+
+          studentAnswers.push({ question: q.Contenu, answer });
+        });
+
+        document.getElementById("score-text").textContent =
+          `Score automatique (QCM) : ${score} / ${totalQCM}`;
+
+        document.getElementById("open-answers").textContent =
+          JSON.stringify(openAnswers, null, 2);
+
+        document.getElementById("result-section").style.display = "block";
+      };
+    }
+
+    document.addEventListener("DOMContentLoaded", initExam);
+  </script>
+</body>
+</html>
