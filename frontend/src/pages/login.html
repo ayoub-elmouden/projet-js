@@ -2,10 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="login.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+        rel="stylesheet"
+        href="login.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
     <title>Login page</title>
 </head>
 
@@ -13,34 +19,37 @@
     <!-- HEADER -->
     <div class="headerContainer">
         <div class="header">
-          <a href="/frontend/src/pages/login.html" class="logo">
-            <img src="/frontend/src/images/logo-no-background.png" alt="logo"/>
-          </a>
-          
+            <a href="/pages/login.html" class="logo">
+                <img src="../images/logo-no-background.png" alt="logo" />
+            </a>
         </div>
-      </div>
-    <!--  Login form  -->  
+    </div>
+    <!--  Login form  -->
     <div class="container" id="container">
         <div class="form-container sign-up">
             <form>
                 <h1>Creer un nouveau Compte</h1>
 
-                <input type="text" placeholder="Votre Nom">
-                <input type="text" placeholder="Votre Prenom">
-                <input type="email" placeholder="Email">
-                <input type="password" placeholder="Mot De Passe">
-                <button>Conexion</button>
+                <input type="text" placeholder="Votre Nom" required />
+                <input type="text" placeholder="Votre Prenom" required />
+                <input type="email" placeholder="Email" required />
+                <input type="password" placeholder="Mot De Passe" required />
+                <input type="date" placeholder="Date de Naissance" required />
+                <div class="sexe-checkbox">
+                    <label><input type="checkbox" name="sexe" value="Homme" /> Homme</label>
+                    <label><input type="checkbox" name="sexe" value="Femme" /> Femme</label>
+                </div>
+                <button type="submit">Conexion</button>
             </form>
         </div>
         <div class="form-container sign-in">
             <form>
                 <h1>Bienvenue Monsieur</h1>
 
-                
-                <input type="email" placeholder="Email">
-                <input type="password" placeholder="Mot De Passe">
-                
-                <button>Conexion</button>
+                <input type="email" placeholder="Email" required />
+                <input type="password" placeholder="Mot De Passe" required />
+
+                <button type="submit">Conexion</button>
             </form>
         </div>
         <div class="toggle-container">

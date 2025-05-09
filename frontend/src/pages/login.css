@@ -202,3 +202,25 @@ body{
 .container.active .toggle-right{
     transform: translateX(200%);
 }
+.sexe-checkbox {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin: 8px 0;
+    background-color: #eee;
+    padding: 10px 15px;
+    border-radius: 8px;
+}
+
+.sexe-checkbox label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+}
+
+.sexe-checkbox input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: #007bff;
+}
