@@ -29,9 +29,9 @@ body{
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
     position: relative;
     overflow: hidden;
-    width: 768px;
+    width: 900px; /* Increased width from 768px to 900px */
     max-width: 100%;
-    min-height: 480px;
+    min-height: 580px; /* Increased height to fit all form elements */
 }
 
 .container p{
@@ -43,6 +43,7 @@ body{
 
 .container h1{
     text-align: center;
+    margin-bottom: 12px;
 }
 
 .container a{
@@ -77,14 +78,15 @@ body{
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    padding: 0 40px;
+    padding: 20px 50px; /* Increased horizontal padding from 40px to 50px */
     height: 100%;
+    gap: 5px; /* Add space between form elements */
 }
 
 .container input{
     background-color: #eee;
     border: none;
-    margin: 8px 0;
+    margin: 6px 0;
     padding: 10px 15px;
     font-size: 13px;
     border-radius: 8px;
@@ -134,8 +136,6 @@ body{
     }
 }
 
-
-
 .toggle-container{
     position: absolute;
     top: 0;
@@ -147,7 +147,6 @@ body{
     border-radius: 150px 0 0 100px;
     z-index: 1000;
 }
-
 
 .container.active .toggle-container{
     transform: translateX(-100%);
@@ -179,7 +178,7 @@ body{
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    padding: 0 30px;
+    padding: 0 40px; /* Increased from 30px to 40px */
     text-align: center;
     top: 0;
     transform: translateX(0);
@@ -202,6 +201,7 @@ body{
 .container.active .toggle-right{
     transform: translateX(200%);
 }
+
 .sexe-checkbox {
     display: flex;
     justify-content: space-between;
@@ -223,4 +223,28 @@ body{
 .sexe-checkbox input[type="checkbox"] {
     margin-right: 8px;
     accent-color: #007bff;
+}
+
+/* Filière dropdown styling */
+.filiere-dropdown {
+    background-color: #eee;
+    border: none;
+    margin: 8px 0;
+    padding: 10px 15px;
+    font-size: 13px;
+    border-radius: 8px;
+    width: 100%;
+    outline: none;
+    color: #333;
+    cursor: pointer;
+}
+
+.filiere-dropdown option {
+    color: #333;
+    background-color: #fff;
+    padding: 10px;
+}
+
+.filiere-dropdown:focus {
+    border: 1px solid #007bff;
 }

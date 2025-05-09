@@ -15,6 +15,39 @@ function showAlert(message) {
     alert(message);
 }
 
+// Fetch filières from backend and populate dropdown
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const filiereSelect = document.getElementById('filiere-select');
+        
+        // Only attempt to fetch filières if we're on the registration page
+        if (filiereSelect) {
+            const response = await fetch('http://localhost:5001/api/filieres');
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch filières');
+            }
+            
+            const filieres = await response.json();
+            
+            // Clear any existing options except the placeholder
+            while (filiereSelect.options.length > 1) {
+                filiereSelect.options.remove(1);
+            }
+            
+            // Add new options based on fetched data
+            filieres.forEach(filiere => {
+                const option = document.createElement('option');
+                option.value = filiere.id || filiere._id;
+                option.textContent = filiere.name;
+                filiereSelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching filières:', error);
+    }
+});
+
 // Handle registration form submission
 const registerForm = document.querySelector('.form-container.sign-up form');
 registerForm.addEventListener('submit', async (e) => {
@@ -24,8 +57,14 @@ registerForm.addEventListener('submit', async (e) => {
     const prenom = registerForm.querySelector('input[placeholder="Votre Prenom"]').value.trim();
     const email = registerForm.querySelector('input[placeholder="Email"]').value.trim();
     const password = registerForm.querySelector('input[placeholder="Mot De Passe"]').value;
+    const dateNaissance = registerForm.querySelector('input[type="date"]').value;
+    const filiereId = registerForm.querySelector('#filiere-select').value;
+    
+    // Get selected gender
+    const sexeOptions = registerForm.querySelectorAll('input[name="sexe"]:checked');
+    const sexe = sexeOptions.length > 0 ? sexeOptions[0].value : null;
 
-    if (!nom || !prenom || !email || !password) {
+    if (!nom || !prenom || !email || !password || !dateNaissance || !filiereId || !sexe) {
         showAlert('Please fill in all registration fields.');
         return;
     }
@@ -34,7 +73,16 @@ registerForm.addEventListener('submit', async (e) => {
         const response = await fetch('http://localhost:5001/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nom, prenom, email, password, role: 'student' })
+            body: JSON.stringify({ 
+                nom, 
+                prenom, 
+                email, 
+                password, 
+                dateNaissance,
+                sexe,
+                filiereId,
+                role: 'student' 
+            })
         });
 
         if (!response.ok) {
