@@ -496,9 +496,9 @@
           if (userData.user.role === "student") {
             window.location.href = "/StudentDashboard.html";
           } else if (userData.user.role === "professor") {
-            window.location.href = "/teacher-dashboard.html";
+            window.location.href = "/TeacherDashboard.html";
           } else {
-            showAlert("Unknown user role. Cannot redirect.");
+            showAlert("Unknown user role. Cannot redirect."); 
           }
         } catch (error) {
           showAlert("Login error: " + error.message);
