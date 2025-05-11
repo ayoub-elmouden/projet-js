@@ -280,27 +280,19 @@
       <div class="form-container sign-up">
         <form>
           <h1>Creer un nouveau Compte</h1>
-  
-          
           <input type="text" placeholder="Votre Nom" required />
           <input type="text" placeholder="Votre Prenom" required />
           <input type="email" placeholder="Email" required />
           <input type="password" placeholder="Mot De Passe" required />
           <input type="date" placeholder="Date de Naissance" required />
           <select id="filiere-select" class="filiere-dropdown" required>
-            <option value="" disabled selected>
-              Sélectionner votre filière
-            </option>
-            <!-- Options will be populated from backend -->
+            <option value="" disabled selected>Sélectionner votre filière</option>
+            <!-- Options will be populated dynamically -->
           </select>
-          <input type="hidden" name="id_fil" value="" />
+          <input type="hidden" name="id_fil" value="" /> <!-- Hidden input for id_fil -->
           <div class="sexe-checkbox">
-            <label
-              ><input type="checkbox" name="sexe" value="Homme" /> Homme</label
-            >
-            <label
-              ><input type="checkbox" name="sexe" value="Femme" /> Femme</label
-            >
+            <label><input type="checkbox" name="sexe" value="Homme" /> Homme</label>
+            <label><input type="checkbox" name="sexe" value="Femme" /> Femme</label>
           </div>
           <input type="hidden" name="role" value="student" />
           <button type="submit">Connexion</button>
@@ -359,87 +351,58 @@
       document.addEventListener("DOMContentLoaded", async () => {
         try {
           const filiereSelect = document.getElementById("filiere-select");
+          const idFilInput = document.querySelector('input[name="id_fil"]');
 
           // Map of filière names to their corresponding id_fil
           const filiereMap = {
-            "Informatique": 1, // Example ID for Informatique
-            "Mathematiques": 2, // Example ID for Mathematiques
-            "Physique": 3, // Example ID for Physique
+            "2IDL": 1, // Example ID for Informatique
+            "PC": 2, // Example ID for Mathematiques
+            "BCG": 3, // Example ID for Physique
           };
 
-          // Only attempt to fetch filières if we're on the registration page
-          if (filiereSelect) {
-            const response = await fetch(`${API_BASE_URL}/filieres`);
-
-            if (!response.ok) {
-              throw new Error("Failed to fetch filières");
-            }
-
-            const filieres = await response.json();
-
-            // Clear any existing options except the placeholder
-            while (filiereSelect.options.length > 1) {
-              filiereSelect.options.remove(1);
-            }
-
-            // Add new options based on fetched data
-            filieres.forEach((filiere) => {
-              const option = document.createElement("option");
-              option.value = filiere.name; // Use name as the value
-              option.textContent = filiere.name;
-              filiereSelect.appendChild(option);
-            });
-
-            // Automatically set id_fil when a filière is selected
-            filiereSelect.addEventListener("change", () => {
-              const selectedFiliere = filiereSelect.value;
-              const idFilInput = document.querySelector('input[name="id_fil"]');
-              idFilInput.value = filiereMap[selectedFiliere] || ""; // Set id_fil or clear it
-            });
+          // Fetch filières from the backend and populate the dropdown
+          const response = await fetch(`${API_BASE_URL}/filieres`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch filières");
           }
+
+          const filieres = await response.json();
+
+          // Populate the dropdown with filières
+          filieres.forEach((filiere) => {
+            const option = document.createElement("option");
+            option.value = filiere.name; // Use filière name as the value
+            option.textContent = filiere.name;
+            filiereSelect.appendChild(option);
+          });
+
+          // Automatically set id_fil when a filière is selected
+          filiereSelect.addEventListener("change", () => {
+            const selectedFiliere = filiereSelect.value;
+            idFilInput.value = filiereMap[selectedFiliere] || ""; // Set id_fil or clear it
+            console.log("Selected Filiere:", selectedFiliere); // Debugging
+            console.log("Assigned id_fil:", idFilInput.value); // Debugging
+          });
         } catch (error) {
           console.error("Error fetching filières:", error);
         }
       });
 
       // Handle registration form submission
-      const registerForm = document.querySelector(
-        ".form-container.sign-up form"
-      );
+      const registerForm = document.querySelector(".form-container.sign-up form");
       registerForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const nom = registerForm
-          .querySelector('input[placeholder="Votre Nom"]')
-          .value.trim();
-        const prenom = registerForm
-          .querySelector('input[placeholder="Votre Prenom"]')
-          .value.trim();
-        const email = registerForm
-          .querySelector('input[placeholder="Email"]')
-          .value.trim();
-        const password = registerForm.querySelector(
-          'input[placeholder="Mot De Passe"]'
-        ).value;
-        const dateNaissance =
-          registerForm.querySelector('input[type="date"]').value;
-        const filiereId = registerForm.querySelector("#filiere-select").value;
-
-        // Get selected gender
-        const sexeOptions = registerForm.querySelectorAll(
-          'input[name="sexe"]:checked'
-        );
+        const nom = registerForm.querySelector('input[placeholder="Votre Nom"]').value.trim();
+        const prenom = registerForm.querySelector('input[placeholder="Votre Prenom"]').value.trim();
+        const email = registerForm.querySelector('input[placeholder="Email"]').value.trim();
+        const password = registerForm.querySelector('input[placeholder="Mot De Passe"]').value;
+        const dateNaissance = registerForm.querySelector('input[type="date"]').value;
+        const idFil = registerForm.querySelector('input[name="id_fil"]').value; // Get id_fil
+        const sexeOptions = registerForm.querySelectorAll('input[name="sexe"]:checked');
         const sexe = sexeOptions.length > 0 ? sexeOptions[0].value : null;
 
-        if (
-          !nom ||
-          !prenom ||
-          !email ||
-          !password ||
-          !dateNaissance ||
-          !filiereId ||
-          !sexe
-        ) {
+        if (!nom || !prenom || !email || !password || !dateNaissance || !idFil || !sexe) {
           showAlert("Please fill in all registration fields.");
           return;
         }
@@ -455,16 +418,14 @@
               password,
               dateNaissance,
               sexe,
-              filiereId,
+              id_fil: idFil, // Include id_fil in the request
               role: "student",
             }),
           });
 
           if (!response.ok) {
             const errorData = await response.json();
-            showAlert(
-              "Registration failed: " + (errorData.message || "Unknown error")
-            );
+            showAlert("Registration failed: " + (errorData.message || "Unknown error"));
             return;
           }
 
