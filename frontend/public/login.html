@@ -280,7 +280,8 @@
       <div class="form-container sign-up">
         <form>
           <h1>Creer un nouveau Compte</h1>
-
+  
+          
           <input type="text" placeholder="Votre Nom" required />
           <input type="text" placeholder="Votre Prenom" required />
           <input type="email" placeholder="Email" required />
@@ -300,6 +301,7 @@
               ><input type="checkbox" name="sexe" value="Femme" /> Femme</label
             >
           </div>
+          <input type="hidden" name="role" value="student" />
           <button type="submit">Connexion</button>
         </form>
       </div>
@@ -309,6 +311,7 @@
 
           <input type="email" placeholder="Email" required />
           <input type="password" placeholder="Mot De Passe" required />
+          <input type="hidden" name="role" value="professor" />
           <button type="submit">Connexion</button>
         </form>
       </div>
