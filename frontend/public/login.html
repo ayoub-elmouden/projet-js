@@ -347,20 +347,13 @@
         alert(message);
       }
 
-      // Fetch filières from backend and populate dropdown
+      // Consolidated DOMContentLoaded logic
       document.addEventListener("DOMContentLoaded", async () => {
         try {
+          // Fetch and populate filières
           const filiereSelect = document.getElementById("filiere-select");
           const idFilInput = document.querySelector('input[name="id_fil"]');
 
-          // Map of filière names to their corresponding id_fil
-          const filiereMap = {
-            "2IDL": 1, // Example ID for Informatique
-            "PC": 2, // Example ID for Mathematiques
-            "BCG": 3, // Example ID for Physique
-          };
-
-          // Fetch filières from the backend and populate the dropdown
           const response = await fetch(`${API_BASE_URL}/filieres`);
           if (!response.ok) {
             throw new Error("Failed to fetch filières");
@@ -368,10 +361,13 @@
 
           const filieres = await response.json();
 
-          // Populate the dropdown with filières
+          // Dynamically populate the dropdown and map filière names to IDs
+          const filiereMap = {};
           filieres.forEach((filiere) => {
+            filiereMap[filiere.name] = filiere.id;
+
             const option = document.createElement("option");
-            option.value = filiere.name; // Use filière name as the value
+            option.value = filiere.name;
             option.textContent = filiere.name;
             filiereSelect.appendChild(option);
           });
@@ -379,9 +375,9 @@
           // Automatically set id_fil when a filière is selected
           filiereSelect.addEventListener("change", () => {
             const selectedFiliere = filiereSelect.value;
-            idFilInput.value = filiereMap[selectedFiliere] || ""; // Set id_fil or clear it
-            console.log("Selected Filiere:", selectedFiliere); // Debugging
-            console.log("Assigned id_fil:", idFilInput.value); // Debugging
+            idFilInput.value = filiereMap[selectedFiliere] || "";
+            console.log("Selected Filiere:", selectedFiliere);
+            console.log("Assigned id_fil:", idFilInput.value);
           });
         } catch (error) {
           console.error("Error fetching filières:", error);
@@ -398,7 +394,7 @@
         const email = registerForm.querySelector('input[placeholder="Email"]').value.trim();
         const password = registerForm.querySelector('input[placeholder="Mot De Passe"]').value;
         const dateNaissance = registerForm.querySelector('input[type="date"]').value;
-        const idFil = registerForm.querySelector('input[name="id_fil"]').value; // Get id_fil
+        const idFil = registerForm.querySelector('input[name="id_fil"]').value;
         const sexeOptions = registerForm.querySelectorAll('input[name="sexe"]:checked');
         const sexe = sexeOptions.length > 0 ? sexeOptions[0].value : null;
 
@@ -418,7 +414,7 @@
               password,
               dateNaissance,
               sexe,
-              id_fil: idFil, // Include id_fil in the request
+              id_fil: idFil,
               role: "student",
             }),
           });
@@ -430,7 +426,7 @@
           }
 
           showAlert("Registration successful! Please log in.");
-          container.classList.remove("active"); // Switch to login form
+          container.classList.remove("active");
         } catch (error) {
           showAlert("Registration error: " + error.message);
         }
