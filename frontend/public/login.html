@@ -404,7 +404,8 @@
         }
 
         try {
-          const response = await fetch(`${API_BASE_URL}/auth/register`, {
+          // Register the student
+          const registerResponse = await fetch(`${API_BASE_URL}/auth/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -419,14 +420,32 @@
             }),
           });
 
-          if (!response.ok) {
-            const errorData = await response.json();
+          if (!registerResponse.ok) {
+            const errorData = await registerResponse.json();
             showAlert("Registration failed: " + (errorData.message || "Unknown error"));
             return;
           }
 
-          showAlert("Registration successful! Please log in.");
-          container.classList.remove("active");
+          // Automatically log the student in after registration
+          const loginResponse = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (!loginResponse.ok) {
+            const errorData = await loginResponse.json();
+            showAlert("Login failed after registration: " + (errorData.message || "Unknown error"));
+            return;
+          }
+
+          const userData = await loginResponse.json();
+
+          // Store user data in sessionStorage
+          sessionStorage.setItem("user", JSON.stringify(userData));
+
+          // Redirect to the student dashboard
+          window.location.href = "/StudentDashboard.html";
         } catch (error) {
           showAlert("Registration error: " + error.message);
         }
