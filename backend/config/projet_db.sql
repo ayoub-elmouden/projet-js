@@ -177,4 +177,6 @@ INSERT INTO `inf_mat` (`Id_mat`, `Matiere`) VALUES
 (14, 'Physiologie Animale'),
 (15, 'Biologie Moléculaire et Génétique');
 
+
+
 COMMIT;

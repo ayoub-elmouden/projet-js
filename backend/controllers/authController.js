@@ -1,4 +1,3 @@
-import bcryptjs from 'bcryptjs';
 import { generateToken, verifyToken } from '../config/jwt.js';
 import { pool } from '../config/db.js';
 
@@ -6,21 +5,17 @@ export const authController = {
   // Register a new user (student or professor)
   async register(req) {
     const { email, password, role, nom, prenom, date_naiss, sexe, etablissement, id_fil } = req.body;
-    if (!email || !password || !role || !nom || !prenom) {
-      throw new Error('Email, password, role, nom, and prenom are required');
-    }
-    if (!['student', 'professor'].includes(role)) {
-      throw new Error('Invalid role');
-    }
-
     let connection;
     try {
+      if (!email || !password || !role || !nom || !prenom) {
+        throw new Error('Email, password, role, nom, and prenom are required');
+      }
+      if (!['student', 'professor'].includes(role)) {
+        throw new Error('Invalid role');
+      }
+
       connection = await pool.getConnection();
       await connection.beginTransaction();
-
-      // Hash password
-      const saltRounds = 10;
-      const hashedPassword = await bcryptjs.hash(password, saltRounds);
 
       let userId;
       if (role === 'professor') {
@@ -30,7 +25,7 @@ export const authController = {
         }
         const [result] = await connection.query(
           'INSERT INTO inf_enseignants (nom, prenom, email, password) VALUES (?, ?, ?, ?)',
-          [nom, prenom, email, hashedPassword]
+          [nom, prenom, email, password] // Store plain-text password
         );
         userId = result.insertId;
       } else {
@@ -43,7 +38,7 @@ export const authController = {
         }
         const [result] = await connection.query(
           'INSERT INTO inf_etu (email, nom, prenom, date_naiss, sexe, etablissement, id_fil, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [email, nom, prenom, date_naiss || null, sexe || null, etablissement || null, id_fil, hashedPassword]
+          [email, nom, prenom, date_naiss || null, sexe || null, etablissement || null, id_fil, password] // Store plain-text password
         );
         userId = result.insertId;
       }
@@ -54,6 +49,7 @@ export const authController = {
       return { token, user: { id: userId, email, role, nom, prenom } };
     } catch (err) {
       if (connection) await connection.rollback();
+      console.error('Error during registration:', err.message);
       throw err;
     } finally {
       if (connection) connection.release();
@@ -63,12 +59,12 @@ export const authController = {
   // Login a user
   async login(req) {
     const { email, password } = req.body;
-    if (!email || !password) {
-      throw new Error('Email and password are required');
-    }
-
     let connection;
     try {
+      if (!email || !password) {
+        throw new Error('Email and password are required');
+      }
+
       connection = await pool.getConnection();
       let user, role;
 
@@ -90,14 +86,15 @@ export const authController = {
         }
       }
 
-      const isValid = await bcryptjs.compare(password, user.password);
-      if (!isValid) {
+      // Compare passwords (plain-text comparison)
+      if (user.password !== password) {
         throw new Error('Invalid email or password');
       }
 
       const token = generateToken({ id: user.id, email, role });
       return { token, user: { id: user.id, email, role, nom: user.nom, prenom: user.prenom } };
     } catch (err) {
+      console.error('Error during login:', err.message);
       throw err;
     } finally {
       if (connection) connection.release();
@@ -137,6 +134,7 @@ export const authController = {
 
       return { id: user.id, email: user.email, role, nom: user.nom, prenom: user.prenom };
     } catch (err) {
+      console.error('Error retrieving profile:', err.message);
       throw err;
     } finally {
       if (connection) connection.release();
@@ -156,6 +154,7 @@ export const authController = {
       await connection.query('INSERT INTO revoked_tokens (token) VALUES (?)', [token]);
       return { message: 'Logged out successfully' };
     } catch (err) {
+      console.error('Error during logout:', err.message);
       throw err;
     } finally {
       if (connection) connection.release();

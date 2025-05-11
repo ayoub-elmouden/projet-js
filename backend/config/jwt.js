@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { pool } from './db.js';
 
-const JWT_SECRET = '';
+// Use environment variable or fallback to a default secret key
+const JWT_SECRET = process.env.JWT_SECRET || '123456789abcdefg';
 
 export async function verifyToken(token) {
   let connection;
