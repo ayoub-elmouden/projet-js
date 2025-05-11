@@ -9,6 +9,7 @@ import questionRoutes from './routes/questions.js';
 import userRoutes from './routes/users.js';
 import dashboardRoutes from './routes/dashboard.js';
 import filieresRoutes from './routes/filieres.js';
+import studentRoutes from './routes/student.js';
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/questions', questionRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/filieres', filieresRoutes);
+app.use('/api/student', studentRoutes);
 
 // Add a simple health check route for debugging
 app.get('/health', (req, res) => {
