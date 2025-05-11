@@ -401,7 +401,7 @@
           .value.trim();
         const password = registerForm.querySelector(
           'input[placeholder="Mot De Passe"]'
-        ).value;
+        ).value;  
         const dateNaissance =
           registerForm.querySelector('input[type="date"]').value;
         const filiereId = registerForm.querySelector("#filiere-select").value;
@@ -497,13 +497,13 @@
           sessionStorage.setItem("user", JSON.stringify(userData));
 
           // Redirect based on role
-          if (userData.role === "student") {
-            window.location.href = "/student-dashboard.html";
+          /*if (userData.role === "student") {
+            window.location.href = "/StudentDashboard.html";
           } else if (userData.role === "teacher") {
             window.location.href = "/teacher-dashboard.html";
           } else {
             showAlert("Unknown user role. Cannot redirect.");
-          }
+          }*/
         } catch (error) {
           showAlert("Login error: " + error.message);
         }

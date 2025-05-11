@@ -1,4 +1,22 @@
+version: '3.8'
+
 services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: amc123
+      MYSQL_DATABASE: projet_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pamc123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -6,11 +24,14 @@ services:
       - "5001:5000"
     environment:
       - NODE_ENV=production
-      - DB_HOST=host.docker.internal
+      - DB_HOST=db
       - DB_USER=root
       - DB_PASS=amc123
       - DB_NAME=projet_db
       - DB_PORT=3306
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
     build:
@@ -19,18 +40,8 @@ services:
       - "80:80"
     environment:
       - NODE_ENV=production
-
-  db:
-    image: mysql:8.0
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: amc123
-      MYSQL_DATABASE: "projet_db"
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
+    depends_on:
+      - backend
 
 volumes:
   db_data:

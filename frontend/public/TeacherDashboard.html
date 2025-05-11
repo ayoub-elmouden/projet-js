@@ -911,10 +911,10 @@ document.getElementById('pending-grades-count').textContent = data.pendingGrades
 .catch(error => {
 console.error('Error loading dashboard summary:', error);
 // Set fallback values for demo
-document.getElementById('total-students-count').textContent = '30';
-document.getElementById('active-exams-count').textContent = '3';
-document.getElementById('upcoming-exams-count').textContent = '5';
-document.getElementById('pending-grades-count').textContent = '--';
+// document.getElementById('total-students-count').textContent = '30';
+// document.getElementById('active-exams-count').textContent = '3';
+// document.getElementById('upcoming-exams-count').textContent = '5';
+// document.getElementById('pending-grades-count').textContent = '--';
 });
 }
 
@@ -976,7 +976,7 @@ tableBody.appendChild(row);
 .catch(error => {
 console.error('Error loading exams:', error);
 // Show mock data for demo purposes
-loadMockExamData(tableBody);
+//loadMockExamData(tableBody);
 });
 }
 
@@ -987,9 +987,7 @@ const endpoint = filterFiliere === 'all' ?
 '/api/students' :
 `/api/students?filiere=${encodeURIComponent(filterFiliere)}`;
 
-fetch(endpoint)
-.then(response => response.json())
-.then(students => {
+fetch(endpoint).then(response => response.json()).then(students => {
 tableBody.innerHTML = '';
 
 if (students.length === 0) {
@@ -1037,10 +1035,9 @@ tableBody.appendChild(row);
 .catch(error => {
 console.error('Error loading students:', error);
 // Load mock data for demonstration
-loadMockStudentData(tableBody);
+//loadMockStudentData(tableBody);
 });
-}
-
+};
 // Load grades data
 function loadGradesTable(filterOptions = {}) {
 const tableBody = document.getElementById('grades-table-body');
@@ -1106,10 +1103,9 @@ tableBody.appendChild(row);
 .catch(error => {
 console.error('Error loading grades:', error);
 // Load mock data for demonstration
-loadMockGradeData(tableBody);
+//loadMockGradeData(tableBody);
 });
-}
-
+};
 // Load filiere data
 function loadFiliereData() {
 // Fetch filiere data for dropdowns and filiere page
@@ -1123,6 +1119,7 @@ loadFiliereTable(filieres);
 .catch(error => {
 console.error('Error loading filiere data:', error);
 // Load mock data for demonstration
+/*
 const mockFilieres = [
 { id: 1, code: '2IDL', name: 'Computer Science', department: 'Engineering', studentCount: 45, courseCount: 5 },
 { id: 2, code: 'PC', name: 'Engineering', department: 'Engineering', studentCount: 38, courseCount: 6 },
@@ -1131,6 +1128,7 @@ const mockFilieres = [
 populateFiliereDropdowns(mockFilieres);
 loadFiliereCards(mockFilieres);
 loadFiliereTable(mockFilieres);
+*/
 });
 }
 
@@ -1473,11 +1471,13 @@ updateStudentTable(students, tableBody);
 .catch(error => {
 console.error('Error filtering students:', error);
 // For demonstration, filter the mock data
+/*
 const mockStudents = getMockStudents();
 const filteredStudents = mockStudents.filter(student =>
 `${student.nom} ${student.prenom}`.toLowerCase().includes(name.toLowerCase())
 );
 updateStudentTable(filteredStudents, tableBody);
+*/
 });
 }
 
@@ -1495,11 +1495,13 @@ updateExamTable(exams, tableBody);
 .catch(error => {
 console.error('Error filtering exams:', error);
 // For demonstration, filter the mock data
+/*
 const mockExams = getMockExams();
 const filteredExams = mockExams.filter(exam =>
 exam.title.toLowerCase().includes(title.toLowerCase())
 );
 updateExamTable(filteredExams, tableBody);
+*/
 });
 }
 
@@ -1694,6 +1696,7 @@ timeout = setTimeout(() => func.apply(context, args), delay);
 };
 }
 
+/*
 // Mock data functions for demonstration
 function loadMockExamData(tableBody) {
 const mockExams = getMockExams();
@@ -1709,14 +1712,7 @@ function loadMockGradeData(tableBody) {
 const mockGrades = getMockGrades();
 updateGradeTable(mockGrades, tableBody);
 }
+*/
 
 // Redirect to exam creation page
-function redirectToExamCreation() {
-window.location.href = '/exam-creation.html'; // Replace with the actual URL of the exam creation page
-}
-
-// Add event listener to the "Exams" button to redirect to exam creation page
-document.getElementById('exams-btn').addEventListener('click', redirectToExamCreation);
-</script>
-</body>
-</html>
+//

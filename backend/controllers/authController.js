@@ -6,16 +6,15 @@ export const authController = {
   // Register a new user (student or professor)
   async register(req) {
     const { email, password, role, nom, prenom, date_naiss, sexe, etablissement, id_fil } = req.body;
-    if (!email || !password || !role || !nom || !prenom) {
-      throw new Error('Email, password, role, nom, and prenom are required');
-    }
-    if (!['student', 'professor'].includes(role)) {
-      throw new Error('Invalid role');
-    }
-
-    let connection;
     try {
-      connection = await pool.getConnection();
+      if (!email || !password || !role || !nom || !prenom) {
+        throw new Error('Email, password, role, nom, and prenom are required');
+      }
+      if (!['student', 'professor'].includes(role)) {
+        throw new Error('Invalid role');
+      }
+
+      let connection = await pool.getConnection();
       await connection.beginTransaction();
 
       // Hash password
@@ -53,23 +52,20 @@ export const authController = {
       const token = generateToken({ id: userId, email, role });
       return { token, user: { id: userId, email, role, nom, prenom } };
     } catch (err) {
-      if (connection) await connection.rollback();
+      console.error('Error during registration:', err.message);
       throw err;
-    } finally {
-      if (connection) connection.release();
     }
   },
 
   // Login a user
   async login(req) {
     const { email, password } = req.body;
-    if (!email || !password) {
-      throw new Error('Email and password are required');
-    }
-
-    let connection;
     try {
-      connection = await pool.getConnection();
+      if (!email || !password) {
+        throw new Error('Email and password are required');
+      }
+
+      let connection = await pool.getConnection();
       let user, role;
 
       // Check inf_enseignants
@@ -98,9 +94,8 @@ export const authController = {
       const token = generateToken({ id: user.id, email, role });
       return { token, user: { id: user.id, email, role, nom: user.nom, prenom: user.prenom } };
     } catch (err) {
+      console.error('Error during login:', err.message);
       throw err;
-    } finally {
-      if (connection) connection.release();
     }
   },
 
@@ -137,6 +132,7 @@ export const authController = {
 
       return { id: user.id, email: user.email, role, nom: user.nom, prenom: user.prenom };
     } catch (err) {
+      console.error('Error retrieving profile:', err.message);
       throw err;
     } finally {
       if (connection) connection.release();
@@ -156,6 +152,7 @@ export const authController = {
       await connection.query('INSERT INTO revoked_tokens (token) VALUES (?)', [token]);
       return { message: 'Logged out successfully' };
     } catch (err) {
+      console.error('Error during logout:', err.message);
       throw err;
     } finally {
       if (connection) connection.release();
