@@ -300,9 +300,7 @@
               ><input type="checkbox" name="sexe" value="Femme" /> Femme</label
             >
           </div>
-          <button type="submit">
-            <a href="StudentDashboard.html">Conexion</a>
-          </button>
+          <button type="submit">Connexion</button>
         </form>
       </div>
       <div class="form-container sign-in">
@@ -311,9 +309,7 @@
 
           <input type="email" placeholder="Email" required />
           <input type="password" placeholder="Mot De Passe" required />
-          <button type="submit">
-            <a href="TeacherDashboard.html">Conexion</a>
-          </button>
+          <button type="submit">Connexion</button>
         </form>
       </div>
       <div class="toggle-container">
@@ -333,6 +329,11 @@
     </div>
 
     <script>
+      const API_BASE_URL =
+        window.location.hostname === "localhost"
+          ? "http://localhost:5001/api"
+          : "http://backend:5001/api";
+
       const container = document.getElementById("container");
       const registerBtn = document.getElementById("register");
       const loginBtn = document.getElementById("login");
@@ -357,7 +358,7 @@
 
           // Only attempt to fetch filières if we're on the registration page
           if (filiereSelect) {
-            const response = await fetch("http://localhost:5001/api/filieres");
+            const response = await fetch(`${API_BASE_URL}/filieres`);
 
             if (!response.ok) {
               throw new Error("Failed to fetch filières");
@@ -401,7 +402,7 @@
           .value.trim();
         const password = registerForm.querySelector(
           'input[placeholder="Mot De Passe"]'
-        ).value;  
+        ).value;
         const dateNaissance =
           registerForm.querySelector('input[type="date"]').value;
         const filiereId = registerForm.querySelector("#filiere-select").value;
@@ -426,23 +427,20 @@
         }
 
         try {
-          const response = await fetch(
-            "http://localhost:5001/api/auth/register",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                nom,
-                prenom,
-                email,
-                password,
-                dateNaissance,
-                sexe,
-                filiereId,
-                role: "student",
-              }),
-            }
-          );
+          const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nom,
+              prenom,
+              email,
+              password,
+              dateNaissance,
+              sexe,
+              filiereId,
+              role: "student",
+            }),
+          });
 
           if (!response.ok) {
             const errorData = await response.json();
@@ -477,7 +475,7 @@
         }
 
         try {
-          const response = await fetch("http://localhost:5001/api/auth/login", {
+          const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -485,9 +483,7 @@
 
           if (!response.ok) {
             const errorData = await response.json();
-            showAlert(
-              "Login failed: " + (errorData.message || "Unknown error")
-            );
+            showAlert(`Login failed: ${errorData.message || "Unknown error"}`);
             return;
           }
 
@@ -497,13 +493,13 @@
           sessionStorage.setItem("user", JSON.stringify(userData));
 
           // Redirect based on role
-          /*if (userData.role === "student") {
+          if (userData.user.role === "student") {
             window.location.href = "/StudentDashboard.html";
-          } else if (userData.role === "teacher") {
+          } else if (userData.user.role === "professor") {
             window.location.href = "/teacher-dashboard.html";
           } else {
             showAlert("Unknown user role. Cannot redirect.");
-          }*/
+          }
         } catch (error) {
           showAlert("Login error: " + error.message);
         }
@@ -511,3 +507,4 @@
     </script>
   </body>
 </html>
+``` 

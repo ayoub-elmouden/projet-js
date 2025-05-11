@@ -1,18 +1,20 @@
-# Use official Node.js LTS image with multi-arch support
-FROM node:18-alpine
+# Use the official Node.js image
+FROM node:18
 
-# Set working directory
+# Set the working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package.json package-lock.json ./
-RUN npm install --production
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-# Copy backend source code
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
 COPY . .
 
-# Expose backend port (adjust if different)
-EXPOSE 5000
+# Expose the application port
+EXPOSE 5001
 
-# Start the backend server
-CMD ["node", "app.js"]
+# Start the application
+CMD ["npm", "start"]

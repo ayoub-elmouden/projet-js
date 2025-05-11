@@ -13,19 +13,24 @@ import filieresRoutes from './routes/filieres.js';
 const app = express();
 
 // CORS configuration
-const allowedOrigins = ['http://127.0.0.1:5501', 'http://localhost:8000', 'http://localhost:5501', 'http://localhost:5500', 'http://localhost'];
+const allowedOrigins = [
+  'http://127.0.0.1:5501',
+  'http://localhost:8000',
+  'http://localhost:5501',
+  'http://localhost:5500',
+  'http://localhost',
+  'http://frontend', // Docker service name
+  'http://frontend:80', // Docker service name with port
+  '*', // Allow all origins (use only for debugging)
+];
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: '*',
   credentials: true
 }));
 
 app.use(express.json());
+
+app.use(express.static('public')); // Ensure 'public' contains the file
 
 app.use('/api/auth', authRoutes);
 app.use('/api/exams', examRoutes);
