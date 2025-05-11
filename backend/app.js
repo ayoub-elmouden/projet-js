@@ -30,7 +30,7 @@ app.use(cors({
 
 app.use(express.json());
 
-app.use(express.static('public')); // Ensure 'public' contains the file
+app.use(express.static('frontend/public')); // Ensure 'public' contains the file
 
 app.use('/api/auth', authRoutes);
 app.use('/api/exams', examRoutes);
